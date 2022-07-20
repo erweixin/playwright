@@ -121,6 +121,8 @@ export class JavaScriptLanguageGenerator implements LanguageGenerator {
         let method = 'click';
         if (action.clickCount === 2)
           method = 'dblclick';
+        if (action.button === 'middle')
+          method = 'hover';
         const modifiers = toModifiers(action.modifiers);
         const options: MouseClickOptions = {};
         if (action.button !== 'left')
@@ -131,6 +133,8 @@ export class JavaScriptLanguageGenerator implements LanguageGenerator {
           options.clickCount = action.clickCount;
         if (action.position)
           options.position = action.position;
+        if (options.button === 'middle')
+          delete options.button;
         const optionsString = formatOptions(options, false);
         return asLocator(action.selector) + `.${method}(${optionsString})`;
       }

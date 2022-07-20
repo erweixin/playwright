@@ -98,6 +98,8 @@ export class JavaLanguageGenerator implements LanguageGenerator {
         let method = 'click';
         if (action.clickCount === 2)
           method = 'dblclick';
+        if (action.button === 'middle')
+          method = 'hover';
         const modifiers = toModifiers(action.modifiers);
         const options: MouseClickOptions = {};
         if (action.button !== 'left')
@@ -108,6 +110,8 @@ export class JavaLanguageGenerator implements LanguageGenerator {
           options.clickCount = action.clickCount;
         if (action.position)
           options.position = action.position;
+        if (options.button === 'middle')
+          delete options.button;
         const optionsText = formatClickOptions(options);
         return asLocator(action.selector) + `.${method}(${optionsText})`;
       }

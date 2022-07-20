@@ -20,6 +20,36 @@ test.describe('cli codegen', () => {
   test.skip(({ mode }) => mode !== 'default');
   test.fixme(({ browserName, headless }) => browserName === 'firefox' && !headless, 'Focus is off');
 
+  test.only('should click tt', async ({ page, openRecorder }) => {
+    const recorder = await openRecorder();
+
+    await recorder.setContentAndWait(`<button onclick="console.log('click')">Submit</button>`);
+
+    const selector = await recorder.hoverOverElement('button');
+    expect(selector).toBe('text=Submit');
+
+    const [sources] = await Promise.all([
+      recorder.waitForOutput('JavaScript', 'hover'),
+      page.click('button', { button: 'middle' })
+    ]);
+
+    expect(sources.get('JavaScript').text).toContain(`
+  // Click text=Submit
+  await page.locator('text=Submit').hover();`);
+
+    expect(sources.get('Python').text).toContain(`
+    # Click text=Submit
+    page.locator("text=Submit").hover()`);
+
+    expect(sources.get('Python Async').text).toContain(`
+    # Click text=Submit
+    await page.locator("text=Submit").hover()`);
+
+    expect(sources.get('Java').text).toContain(`
+      // Click text=Submit
+      page.locator("text=Submit").hover();`);
+  });
+
   test('should click', async ({ page, openRecorder }) => {
     const recorder = await openRecorder();
 
